@@ -9,10 +9,11 @@
 <body>
     
     <div id="graph"></div>
-    
+    <div id="demgraph"></div>
     <script>
         
         var url = "http://elections.huffingtonpost.com/pollster/api/charts/2016-national-gop-primary";
+        var democraturl = "http://elections.huffingtonpost.com/pollster/api/charts?topic=2016-president-dem-primary";
         
         $.ajax(url, {
             dataType: "jsonp",
@@ -21,6 +22,31 @@
             success: function(data) {
                 
                 var candidateBar = d3.select("#graph").selectAll("div").data(data.estimates),
+                    candidateWrapper = candidateBar.enter().append("div").classed("group", true);
+                
+                candidateWrapper.append("div")
+                    .classed("choice", true)
+                    .text(function(candidate) {
+                        return candidate.choice + " " + candidate.value + "%";
+                    });
+                
+                candidateWrapper.append("div")
+                    .classed("bar", true)
+                    .transition()
+                    .duration(1000)
+                    .style("width", function(candidate) {
+                        return candidate.value * 10 + "px";
+                    });
+                
+            }
+        });
+                $.ajax(democraturl, {
+            dataType: "jsonp",
+            jsonpCallback: "pollsterCallback",
+            cache: true,
+            success: function(data) {
+                
+                var candidateBar = d3.select("#demgraph").selectAll("div").data(data.estimates),
                     candidateWrapper = candidateBar.enter().append("div").classed("group", true);
                 
                 candidateWrapper.append("div")
